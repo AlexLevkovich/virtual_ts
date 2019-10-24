@@ -87,7 +87,7 @@ static int __init virt_ts_init(void) {
 	int err;
 	int i;
     
-	if (!display_setup()) goto fail1;
+	if (!display_setup()) return -1;
     
 	for(i=0;i<MAX_CONTACTS;i++) {
 		touch_ids[i].x = 0;
@@ -118,14 +118,19 @@ static int __init virt_ts_init(void) {
 	__set_bit(INPUT_PROP_DIRECT,virt_ts_dev->propbit);    
     
 	err = input_register_device(virt_ts_dev);
-	if (err) goto fail1;
+	if (err) {
+        printk("<4>virtual_ts: Registering the input device failed\n");
+		input_free_device(virt_ts_dev);
+		return err;
+    }
 
 	/* Above is evdev part. Below is character device part */
 
 	Major = register_chrdev(0, MODNAME, &fops);	
 	if (Major < 0) {
-		printk("<4>virtual_ts: Registering the character device failed with %d\n", Major);
-		goto fail1;
+		printk("<4>virtual_ts: Registering the character device failed\n");
+		input_free_device(virt_ts_dev);
+		return Major;
 	}
 	printk("virtual_ts: Major=%d\n", Major);
 
@@ -133,9 +138,6 @@ static int __init virt_ts_init(void) {
 	if (!IS_ERR(cl)) dev = device_create(cl, NULL, MKDEV(Major,0), NULL, MODNAME);
 
 	return 0;
-
-fail1:	input_free_device(virt_ts_dev);
-	return err;
 }
 
 static int device_open(struct inode *inode, struct file *file) {
