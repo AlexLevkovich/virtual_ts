@@ -119,10 +119,10 @@ static int __init virt_ts_init(void) {
     
 	err = input_register_device(virt_ts_dev);
 	if (err) {
-        printk("<4>virtual_ts: Registering the input device failed\n");
+		printk("<4>virtual_ts: Registering the input device failed\n");
 		input_free_device(virt_ts_dev);
 		return err;
-    }
+	}
 
 	/* Above is evdev part. Below is character device part */
 
@@ -162,7 +162,7 @@ static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_
 	"  Associated ID of the touch is always the first free one and starts from 0\n"
 	"  Driver does not return IDs it associates so you need to keep them in mind to have your code workable!\n"
 	"  Extra touches are being ommited and corresponding error is being generated!\n"        
-	"  Moreover, if you registered unusual behaviour then use dmesg to find out what's wrong!\n";      
+	"  Moreover, if you register unusual behaviour then use dmesg to find out what's wrong!\n";      
 	const size_t msgsize = strlen(message);
 	loff_t off = *offset;
 	if (off >= msgsize) return 0;
@@ -345,3 +345,4 @@ module_exit(virt_ts_exit);
 MODULE_AUTHOR("Initial author: Vitaly Shukela, vi0oss@gmail.com\nModified by Alex Levkovich, alevkovich@tut.by");
 MODULE_DESCRIPTION("Virtual touchscreen driver");
 MODULE_LICENSE("GPL");
+
